@@ -1,16 +1,16 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic
-TARGET = cast
+TARGET = main
 
 all: $(TARGET)
 
-$(TARGET): cast.o
+$(TARGET): main.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-cast.o: cast.c
+main.o: main.c
 	$(CC) $(CFLAGS) -c $< -o $@	
 
 clean:
 	rm *.o $(TARGET)
 
-.PHONY: all clean
+.PHONY: all clean	
