@@ -97,63 +97,30 @@ alternate_sum_4_using_c_alternative:
 
 
 ; uint32_t alternate_sum_8(uint32_t x1, uint32_t x2, uint32_t x3, uint32_t x4, uint32_t x5, uint32_t x6, uint32_t x7, uint32_t x8);
-; registros y pila: x1[?], x2[?], x3[?], x4[?], x5[?], x6[?], x7[?], x8[?]
+; registros y pila: x1[edi], x2[esi], x3[edx], x4[ecx], x5[r8d], x6[r9d], x7[rbp+16], x8[rbp+24]
 alternate_sum_8:
 	;prologo
+  push rbp 
+  mov rbp, rsp 
 
-	push RBP
-  mov RBP , RSP
-  ;x1 y x2 se usan al toque 
-  ;x7 y x8 van al stack asi que no hay que tocarlos
-  ;el resto se preservan en r12,13,14,15
-
-  ;hacemos lugar en el stack
-  push R12
-  push R13
-  push R14
-  push R15
-
-  ;guardamos valores
-  mov R12D,EDX ;x3 
-  mov R13D,ECX ;x4
-  mov R14D,R8D ;x5
-  mov R15D,R9D ;x6
+	sub edi, esi
+  add edi, edx
+  sub edi, ecx
+	add edi, r8d
+  sub edi, r9d
   
-  call restar_c
+  ;esto tambien se podria hacer como add edi, dword[rbp+16]
+  mov r9d, [rbp+16]
+  add edi, r9d
 
-  mov EDI, EAX
-  mov ESI, R12D
-  call sumar_c
+  ;mismo que arriba sub edi, dword[rbp+24]
+  mov r9d, [rbp+24]
+  sub edi, r9d
 
-  mov EDI, EAX
-  mov ESI, R13D
-  call restar_c
+	mov eax, edi
 
-  mov EDI, EAX
-  mov ESI, R14D
-  call sumar_c
-
-  mov EDI, EAX
-  mov ESI, R15D
-  call restar_c
-
-  ;x7
-  mov EDI, EAX
-  mov ESI, DWORD[RBP+16]
-  call sumar_c
-
-  mov EDI, EAX
-  mov ESI, DWORD[RBP+24]
-  call restar_c
-  
-  ;epilogo
-  pop R15
-  pop R14
-  pop R13
-  pop R12
-  pop RBP
-
-
+	;epilogo  
+  pop rbp
 	ret
 
 
