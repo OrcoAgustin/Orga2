@@ -8,6 +8,14 @@
 #include "Memoria.h"
 
 int main() {
-	/* Acá pueden realizar sus propias pruebas */
-	return 0;
+ /* Pruebas para strPrint */
+    printf("Prueba con texto: ");
+    strPrint("Hola Orga 2!\n", stdout);
+    printf("Prueba con vacio: ");
+    strPrint("", stdout);
+    printf("\n");
+    printf("Prueba con NULL: ");
+    strPrint(NULL, stdout);
+    printf("\n");
+    return 0;
 }
