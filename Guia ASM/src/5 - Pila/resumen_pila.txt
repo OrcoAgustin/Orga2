@@ -1,0 +1,96 @@
+===============================================================================
+               RESUMEN Y GUÍA DE RESOLUCIÓN - EJERCICIO PILA (GDB)
+===============================================================================
+
+1. OBJETIVO DEL EJERCICIO
+-------------------------
+Identificar la clave secreta de autenticación en el binario ejecutable `validate_key` 
+analizando la pila (stack) y la cadena de llamadas a través de GDB.
+
+2. PROCEDIMIENTO DE RESOLUCIÓN PASO A PASO
+------------------------------------------
+Paso 1: Abrir el ejecutable en GDB (desde la terminal WSL/Linux):
+        $ gdb ./validate_key
+
+Paso 2: Inspeccionar funciones del binario con símbolos de depuración:
+        (gdb) info functions
+        -> Se identificaron las funciones personalizadas: `do_some_stuff`, 
+           `do_some_more_stuff` y `main`.
+
+Paso 3: Colocar puntos de interrupción (breakpoints) en las funciones identificadas:
+        (gdb) b do_some_stuff
+        (gdb) b do_some_more_stuff
+
+Paso 4: Ejecutar el binario en GDB pasándole un argumento de prueba:
+        (gdb) run 1234
+
+Paso 5: Avanzar hasta la función con símbolos (`do_some_more_stuff`):
+        (gdb) c
+
+Paso 6: Analizar la cadena de llamadas (Call Stack / Backtrace):
+        (gdb) bt
+        -> Cadena obtenida:
+           #0 do_some_more_stuff ()
+           #1 do_some_stuff ()
+           #2 main ()
+
+Paso 7: Inspeccionar los valores guardados en la pila (Stack Pointer - $rsp):
+        (gdb) x/32gx $rsp
+        -> Se encontraron varias direcciones de memoria guardadas en el stack.
+
+Paso 8: Interpretar el contenido de las direcciones como punteros a cadenas (char*):
+        (gdb) p (char*) 0x0000555555559070
+        -> Resultado: "clave_172.30.92.193"
+
+Paso 9: Verificación de la clave encontrada:
+        (gdb) run clave_172.30.92.193
+        o desde la terminal:
+        $ ./validate_key clave_172.30.92.193
+
+RESULTADO FINAL:
+  Clave hallada: "clave_172.30.92.193"
+  Función donde reside la clave: `do_some_stuff`
+
+
+===============================================================================
+                     COMANDOS ÚTILES DE GDB UTILIZADOS
+===============================================================================
+
+- Cargar un binario en GDB:
+  gdb ./<nombre_ejecutable>
+
+- Listar funciones del programa:
+  info functions
+
+- Establecer un punto de interrupción (breakpoint):
+  b <nombre_funcion>     (ej: b do_some_stuff)
+  b *0x00005555555552f4  (por dirección de memoria)
+
+- Iniciar la ejecución pasándole argumentos al binario:
+  run <argumentos>       (ej: run 1234)
+
+- Continuar la ejecución hasta el siguiente breakpoint:
+  c   (o continue)
+
+- Mostrar la cadena de llamadas a funciones (Backtrace / Call Stack):
+  bt  (o backtrace)
+
+- Seleccionar un marco de la pila específico (Frame):
+  frame <numero_frame>   (ej: frame 0, frame 1)
+
+- Ver información del marco de pila activo:
+  info frame
+
+- Ver variables locales y argumentos en el frame activo:
+  info locals
+  info args
+
+- Inspeccionar memoria de la Pila (Stack):
+  x/32gx $rsp   -> Muestra 32 quadwords en hexadecimal desde el tope del stack ($rsp).
+  x/32s $rsp    -> Intenta interpretar 32 entradas como strings.
+
+- Imprimir / interpretar una dirección de memoria como string (char*):
+  p (char*) <direccion>   (ej: p (char*) 0x0000555555559070)
+  p {char*} <direccion>   (ej: p {char*} 0x0000555555559070)
+
+===============================================================================
