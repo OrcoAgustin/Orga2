@@ -11,9 +11,9 @@ FALSE EQU 0
 ; Marca un ejercicio como hecho
 TRUE  EQU 1
 
-ITEM_OFFSET_NOMBRE EQU 9
-ITEM_OFFSET_ID EQU 16
-ITEM_OFFSET_CANTIDAD EQU 24
+ITEM_OFFSET_NOMBRE EQU 0
+ITEM_OFFSET_ID EQU 12
+ITEM_OFFSET_CANTIDAD EQU 16
 
 POINTER_SIZE EQU 4
 UINT32_SIZE EQU 8
@@ -21,10 +21,10 @@ UINT32_SIZE EQU 8
 ; Marcar el ejercicio como hecho (`true`) o pendiente (`false`).
 
 global EJERCICIO_1_HECHO
-EJERCICIO_1_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
+EJERCICIO_1_HECHO: db TRUE ; Cambiar por `TRUE` para correr los tests.
 
 global EJERCICIO_2_HECHO
-EJERCICIO_2_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
+EJERCICIO_2_HECHO: db TRUE ; Cambiar por `TRUE` para correr los tests.
 
 global EJERCICIO_3_HECHO
 EJERCICIO_3_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
@@ -34,18 +34,25 @@ EJERCICIO_4_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
 
 global ejercicio1
 ejercicio1:
-	add edi, ecx
-	add edi, edx
-    add edi, ebx
-    add edi, r9d
-	mov eax, edi
+	add rdi, rsi
+	add rdi, rdx
+    add rdi, rcx
+    add rdi, r8
+	mov rax, rdi
 	ret
 
 global ejercicio2
 ejercicio2:
-	mov [rdi+ITEM_OFFSET_ID], rsi
-	mov [rdi+ITEM_OFFSET_CANTIDAD], rdx
+;alinear pila
+	sub rsp, 8
+	mov [rdi+ITEM_OFFSET_ID], esi
+
+	mov [rdi+ITEM_OFFSET_CANTIDAD], edx
+	mov rsi, rcx
+	
 	call strcpy 
+
+	add rsp, 8
 	ret
 
 
