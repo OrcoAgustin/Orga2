@@ -16,13 +16,14 @@ uint64_t ejercicio1(uint64_t sum1, uint64_t sum2, uint64_t sum3, uint64_t sum4, 
 
 ```nasm
 ejercicio1:
-	add edi, ecx
-	add edi, edx
-    add edi, ebx
-    add edi, r9d
-	mov eax, edi
+	add rdi, rcx
+	add rdi, rdx
+    add rdi, rbx
+    add rdi, r9
+	mov rax, rdi
 	ret
 ```
+# no tenia bien el convenio de llamada y mal los regs
 
 # Ejercicio 2
 
