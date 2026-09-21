@@ -14,7 +14,7 @@ TRUE  EQU 1
 ; Funciones a implementar:
 ;   - es_indice_ordenado
 global EJERCICIO_1A_HECHO
-EJERCICIO_1A_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
+EJERCICIO_1A_HECHO: db TRUE ; Cambiar por `TRUE` para correr los tests.
 
 ; Marca el ejercicio 1B como hecho (`true`) o pendiente (`false`).
 ;
@@ -25,10 +25,10 @@ EJERCICIO_1B_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
 
 ;########### ESTOS SON LOS OFFSETS Y TAMAÑO DE LOS STRUCTS
 ; Completar las definiciones (serán revisadas por ABI enforcer):
-ITEM_NOMBRE EQU ??
-ITEM_FUERZA EQU ??
-ITEM_DURABILIDAD EQU ??
-ITEM_SIZE EQU ??
+ITEM_NOMBRE EQU 0	
+ITEM_FUERZA EQU 20
+ITEM_DURABILIDAD EQU 24
+ITEM_SIZE EQU 28
 
 ;; La funcion debe verificar si una vista del inventario está correctamente 
 ;; ordenada de acuerdo a un criterio (comparador)
@@ -59,12 +59,114 @@ es_indice_ordenado:
 	; ubicación según la convención de llamada. Prestá atención a qué
 	; valores son de 64 bits y qué valores son de 32 bits o 8 bits.
 	;
-	; r/m64 = item_t**     inventario
-	; r/m64 = uint16_t*    indice
-	; r/m16 = uint16_t     tamanio
-	; r/m64 = comparador_t comparador
-		ret
+	; r/m64 rdi = item_t**     inventario
+	; r/m64 rsi = uint16_t*    indice
+	; r/m16 dx = uint16_t     tamanio
+	; r/m64 rcx = comparador_t comparador
 
+	;;freestyle
+	;contador = 0
+	;cmp dx,0
+	;	jmp end
+	;cmp dx,1
+	;jmp end
+	
+	;direccionitemActual = rdi[rsi+contador*2]
+	;itemActual = [direccionitemActual]
+	;;contador +=1
+	;direccionitemSig = rdi[rsi+contador*2]
+	;itemSig = [direccionitemSig]
+	;cmp(itemActual, itemSig)
+	;aca es ver en realidad si desp de comparar rax ==0 
+	;tener cuidado con la abi xq haces un call asi que push todo
+	;jne return FALSE
+	;cmp contador, tamanio
+	;jmp .end
+	;jmp .loop
+
+	;end. return true
+
+	push rbp
+	mov rbp, rsp
+	push r12
+	push r13
+	push r14
+	push r15
+	push rbx
+	sub rsp, 8
+
+
+	;guardamos datos de los parametros
+	mov r12,rdi
+	mov r13,rsi
+	movzx r14,dx
+	mov r15,rcx
+
+	cmp dx,0
+	je .verdadero
+
+	cmp dx,1
+	je .verdadero
+
+	mov rbx, 0
+	dec r14 ;cantida de comparaciones finales que haces
+	
+	.loop:
+	movzx r8, word[r13+rbx*2] ;accedo al indice *2 bytes
+	mov rdi, [r12+r8*8] ;cargo el item en rdi
+
+	movzx r9, word[r13+rbx*2+2]
+	mov rsi, [r12+r9*8];next item 
+
+	inc rbx
+
+	call r15
+	cmp rax,0 
+	je .falso
+	
+	cmp rbx, r14
+	jl .loop
+	jge .verdadero
+	
+	.verdadero:
+	mov rax, TRUE
+	jmp .end
+	
+	
+	.falso:
+	mov rax, FALSE
+	jmp .end
+	
+	.end:
+	add rsp, 8
+	pop rbx
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbp
+	ret 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;segundo ej 
 ;; Dado un inventario y una vista, crear un nuevo inventario que mantenga el
 ;; orden descrito por la misma.
 
@@ -91,7 +193,21 @@ indice_a_inventario:
 	; ubicación según la convención de llamada. Prestá atención a qué
 	; valores son de 64 bits y qué valores son de 32 bits o 8 bits.
 	;
-	; r/m64 = item_t**  inventario
-	; r/m64 = uint16_t* indice
-	; r/m16 = uint16_t  tamanio
+	; r/m64/ rdi = item_t**  inventario
+	; r/m64 rsi = uint16_t* indice
+	; r/m16 dx = uint16_t  tamanio
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	ret
