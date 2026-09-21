@@ -199,39 +199,39 @@ indice_a_inventario:
 
 	push rbp
 	mov rbp, rsp
+	push rbx
 	push r12
 	push r13
 	push r14	
+	push r15
+	sub rsp, 8
 		
-	mov r12, rdi
-	mov r13, rsi
-	movzx r14,dx
+	mov r12, rdi ;inventario a copiar
+	mov r13, rsi ;indice 
+	movzx r14, dx ;size 
 
 	mov rdi,r14
 	imul rdi, 8
 
 	call malloc 
 
-	;contador
-	xor r10, r10
-
+	xor r10, r10 ;contador
 
 	.loop:
 		cmp r10,r14
         jge .end 
+        movzx r15, word[r13+r10*2]
+        mov rdi,[r12 +r15 *8] 
+        mov [rax +r10*8], rdi
         inc r10
-        mov r15,[r13+r10*8] ;indice en i 
-        mov r11, r15 ; indice en i x 8 bytes
-        mov rsi, rax; copia de rax con la suma 
-        imul r11, 8;indice en i por bytes
-        mov rdi,[r12+r11] ;item en indice i
-        add rsi, r11
-        mov [rsi],rdi   
 		jmp .loop
 
 	.end:
+		add rsp, 8	
+		pop r15
 		pop r14
 		pop r13
 		pop r12
+		pop rbx
 		pop rbp
 		ret
