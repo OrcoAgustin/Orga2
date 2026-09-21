@@ -21,7 +21,7 @@ EJERCICIO_1A_HECHO: db TRUE ; Cambiar por `TRUE` para correr los tests.
 ; Funciones a implementar:
 ;   - indice_a_inventario
 global EJERCICIO_1B_HECHO
-EJERCICIO_1B_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
+EJERCICIO_1B_HECHO: db TRUE ; Cambiar por `TRUE` para correr los tests.
 
 ;########### ESTOS SON LOS OFFSETS Y TAMAÑO DE LOS STRUCTS
 ; Completar las definiciones (serán revisadas por ABI enforcer):
@@ -197,17 +197,41 @@ indice_a_inventario:
 	; r/m64 rsi = uint16_t* indice
 	; r/m16 dx = uint16_t  tamanio
 
+	push rbp
+	mov rbp, rsp
+	push r12
+	push r13
+	push r14	
+		
+	mov r12, rdi
+	mov r13, rsi
+	movzx r14,dx
+
+	mov rdi,r14
+	imul rdi, 8
+
+	call malloc 
+
+	;contador
+	xor r10, r10
 
 
+	.loop:
+		cmp r10,r14
+        jge .end 
+        inc r10
+        mov r15,[r13+r10*8] ;indice en i 
+        mov r11, r15 ; indice en i x 8 bytes
+        mov rsi, rax; copia de rax con la suma 
+        imul r11, 8;indice en i por bytes
+        mov rdi,[r12+r11] ;item en indice i
+        add rsi, r11
+        mov [rsi],rdi   
+		jmp .loop
 
-
-
-
-
-
-
-
-
-
-
-	ret
+	.end:
+		pop r14
+		pop r13
+		pop r12
+		pop rbp
+		ret
