@@ -32,43 +32,37 @@ USUARIO_CANT_BLOQUEADOS_OFFSET EQU 48;
 USUARIO_ID_OFFSET EQU 52; 
 USUARIO_SIZE EQU 56
 
-; void publicar(tuit_t *tuit, usuario_t *usuario);
+
+
+; void agregarTuitAFeed(tuit_t tuit, usuario_t *usuario  )
 global agregarTuitAFeed
 agregarTuitAFeed:
 push rbp
-mov rbp, rsp
-push r12 ;direc del tuit
-push r13 ;direc del usr
-push r14 ;feed del usr
-push r15 ;dir de la nueva publicacion 
+mov rbp,rsp
+push r12 ;dir del tuit
+push r13 ;feed del user
+push r14 ;direc de la publi
+sub rsp, 8
 
 mov r12, rdi
-mov r13, rsi
+mov r13, [rsi+USUARIO_FEED_OFFSET]
 
-mov r14,[r13+USUARIO_FEED_OFFSET]
-
-;pedimos memoria para la publicacion
 mov rdi, PUBLICACION_SIZE
-call malloc 
-mov r15, rax
+call malloc
+mov r14, rax
 
-;armamos la publicaacion
-mov r11, [r14+FEED_FIRST_OFFSET]
-mov [r15+PUBLICACION_NEXT_OFFSET],r11
-
-mov [r15+PUBLICACION_VALUE_OFFSET], r12
-
-;lo ponemos como 1ro del feed
-mov [r14+FEED_FIRST_OFFSET], r15
+mov r11,[r13+FEED_FIRST_OFFSET]
+mov [r14], r11
+mov [r14+PUBLICACION_VALUE_OFFSET], r12
+mov [r13+FEED_FIRST_OFFSET], r14
 
 .end:
-    pop r15
+    add rsp, 8
     pop r14
     pop r13
-    pop r12
+    pop r12 
     pop rbp
     ret
-
 
 
 ; tuit_t *publicar(char *mensaje, usuario_t *usuario);
@@ -76,56 +70,52 @@ global publicar
 publicar:
 push rbp
 mov rbp, rsp
-push r12 ;mensaje
-push r13 ;direc usr 
-push r14 ;direc del tuit
-push r15 ;donde estoy de los seguidores
-push rbx ;contador
-sub rsp,8
+push r12;rdi,mensaje
+push r13;rsi,user
+push r14;dir del tuit
+push r15 ;contador
+push rbx ;dir de followers
+sub rsp, 8
 
 mov r12, rdi
-mov r13 ,rsi
+mov r13, rsi
 
-;pedimos memo para el tuit
 mov rdi, TUIT_SIZE
 call malloc
-mov r14, rax
 
-;llenamos tuit
-mov rdi, r14
-mov rsi, r12
+;guardamos addy del tweet y lo armamos
+mov r14,rax
+
+lea rdi,[r14+TUIT_MENSAJE_OFFSET]
+mov rsi,r12
 call strcpy
-;listo el mensaje
-mov [r14+TUIT_FAVORITOS_OFFSET], 0
-mov [r14+TUIT_RETUITS_OFFSET], 0
 
-mov r10d, dword [r13+USUARIO_ID_OFFSET]
-mov [r14+TUIT_ID_AUTOR_OFFSET], r10d
+mov word [r14+TUIT_FAVORITOS_OFFSET],0
+mov word [r14+TUIT_RETUITS_OFFSET],0
 
+mov eax,[r13+USUARIO_ID_OFFSET]
+mov [r14+TUIT_ID_AUTOR_OFFSET],eax
+
+;ya esta el tuit armado
 mov rdi, r14
 mov rsi, r13
-
 call agregarTuitAFeed
 
-mov r15,[r13+USUARIO_SEGUIDORES_OFFSET]
-xor rbx, rbx
+xor r15d, r15d
+mov rbx, [r13+USUARIO_SEGUIDORES_OFFSET]
+
 .loop:
-    mov r11d, dword[r13+USUARIO_CANT_SEGUIDORES_OFFSET]
-    cmp r11d, ebx
+    cmp r15d,dword[r13+USUARIO_CANT_SEGUIDORES_OFFSET]
     je .end
-    
-    mov rdi, r14 ;cargo el tuit
-    
-    mov rsi,[r15] ;cargo el user siguiente
+    mov rdi, r14
+    mov rsi,[rbx+r15*8]
     call agregarTuitAFeed
-    
-    add r15,8
-    inc rbx
+    inc r15d
     jmp .loop
 
 .end:
     mov rax, r14
-    add rsp,8
+    add rsp, 8
     pop rbx
     pop r15
     pop r14

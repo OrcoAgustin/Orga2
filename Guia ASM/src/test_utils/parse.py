@@ -24,10 +24,11 @@ class StructFieldVisitor(pycparser.c_ast.NodeVisitor):
         nombre = node.declname
         typ = node.type
         if type(typ) == pycparser.c_ast.Struct:
-            for decl in typ.decls:
-                campo = decl.name
-                linea = decl.coord.line
-                self.campos.append((linea, (nombre, "offset", campo)))
+            if typ.decls is not None:
+                for decl in typ.decls:
+                    campo = decl.name
+                    linea = decl.coord.line
+                    self.campos.append((linea, (nombre, "offset", campo)))
 
             linea = node.coord.line
             self.campos.append((linea, (nombre, "size")))

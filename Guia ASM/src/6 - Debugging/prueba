@@ -1,0 +1,64 @@
+def ejercicio4(direccion_array, n, C):
+    direcnueva = malloc 4 * n(para el array) 
+    i=0
+    while i < n:
+        direcnueva[i] = [direccion_array[i]]*C
+        free(direccion_array[i])
+        direccion_array[i]=NULL
+        i++
+    return direcnueva
+
+push rbp
+mov rbp,rsp
+push rbx
+push r12
+push r13
+push r14
+push r15
+
+
+;rdi dir array
+;rsi n(size)
+;rdx constante c
+;guardamos
+mov r12, rdi ;direccion_array
+mov r13d, rsi ;n 
+mov r14d, rdx ;c
+mov r15, 0 ;i=0
+
+lea rdi, [rsi*4] ; malloc 4*n
+call malloc
+mov rbx, rax ; direcnueva
+
+
+.loop:
+    cmp r15d, r13d
+    je .end
+    lea rdi,[r12+r15*8] ;direccion_array[i]
+    mov rsi,rdi
+    imul rsi, r14d ; [direccion_array[i]]*C
+    mov [rbx+r15*4], rdi
+    call free
+    mov rdi, 0
+    inc r15
+    jmp .loop
+    
+.end:
+    mov rax, rbx
+    pop r15
+    pop r14
+    pop r13
+    pop r12 
+    pop rbx
+    pop rbp
+    ret
+
+
+
+
+
+
+
+
+
+
