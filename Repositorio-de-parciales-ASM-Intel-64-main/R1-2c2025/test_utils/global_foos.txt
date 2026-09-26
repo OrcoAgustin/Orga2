@@ -1,2 +1,1 @@
-global_foo_label hayTesoro
-global_foo_label encontrarTesoroEnMapa
+global_foo_label sumarTesoros

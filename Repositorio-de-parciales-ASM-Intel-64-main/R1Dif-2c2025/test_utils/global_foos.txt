@@ -1,0 +1,2 @@
+global_foo_label malloc
+global_foo_label prepareBackpack
